@@ -1,8 +1,4 @@
-﻿// Eqipa 2.0
-// Original author: '`Deto' (deto_deto)
-// Refactor version: 'Norelock' (norelock)
-
-namespace Eqipa.Util;
+﻿namespace Eqipa.Util;
 
 /// <summary>
 ///  Singleton class that ensures only one instance of a class is created.

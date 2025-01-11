@@ -1,7 +1,3 @@
-// Eqipa 2.0
-// Original author: '`Deto' (deto_deto)
-// Refactor version: 'Norelock' (norelock)
-
 using Eqipa.Model;
 
 namespace Eqipa.Util;

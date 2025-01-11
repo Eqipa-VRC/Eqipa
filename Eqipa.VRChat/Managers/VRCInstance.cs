@@ -12,7 +12,7 @@ public class VRCInstanceManager : IManager
 
   private UserManager? _userManager;
   private VRCLogReader? _logReader;
-  private DiscordManager? _discordManager;
+  private DiscordWebhookManager? _discordManager;
   private readonly Dictionary<int, VRCInstance> _processInstances = new();
 
   public bool IsInitialized => _isInitialized;
@@ -35,8 +35,8 @@ public class VRCInstanceManager : IManager
     if (_core.HasManager<UserManager>())
       _userManager = _core.GetManagerOrDefault<UserManager>();
 
-    if (_core.HasManager<DiscordManager>())
-      _discordManager = _core.GetManagerOrDefault<DiscordManager>();
+    if (_core.HasManager<DiscordWebhookManager>())
+      _discordManager = _core.GetManagerOrDefault<DiscordWebhookManager>();
 
     _logReader!.OnProcessed += OnLogProcessed;
     Logger.Log(LogLevel.Info, "VRCInstanceManager initialized.");

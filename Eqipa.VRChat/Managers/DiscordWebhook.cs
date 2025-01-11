@@ -6,7 +6,7 @@ using Swan;
 
 namespace Eqipa.Manager;
 
-public class DiscordManager : IManager
+public class DiscordWebhookManager : IManager
 {
   private readonly Core _core;
 
@@ -18,7 +18,7 @@ public class DiscordManager : IManager
 
   public bool IsInitialized => _isInitialized;
 
-  public DiscordManager(Core core)
+  public DiscordWebhookManager(Core core)
   {
     _core = core ?? throw new ArgumentNullException(nameof(core));
     _webhookUrl = _core.Config.GetConfig<string?>(c => c.DiscordWebhookUrl!);
@@ -39,7 +39,7 @@ public class DiscordManager : IManager
   public async Task SendEmbed(string title, string description, string? colorHex = "#5865F2")
   {
     if (!_isInitialized)
-      throw new InvalidOperationException("DiscordManager is not initialized.");
+      throw new InvalidOperationException("DiscordWebhookManager is not initialized.");
 
     if (string.IsNullOrEmpty(_webhookUrl))
       throw new InvalidOperationException("Webhook URL is not set.");
@@ -75,7 +75,7 @@ public class DiscordManager : IManager
     _httpClient = null;
 
     _isInitialized = false;
-    Logger.Log(LogLevel.Info, "DiscordManager shutdown");
+    Logger.Log(LogLevel.Info, "DiscordWebhookManager shutdown");
   }
 
   public void Dispose()
@@ -96,7 +96,7 @@ public class DiscordManager : IManager
     _isDisposed = true;
   }
 
-  ~DiscordManager()
+  ~DiscordWebhookManager()
   {
     Dispose(false);
   }

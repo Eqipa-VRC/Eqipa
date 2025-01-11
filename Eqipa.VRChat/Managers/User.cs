@@ -19,7 +19,7 @@ public class UserManager : Registry<User>, IManager
   private string? _groupId = string.Empty;
 
   private VRCManager? _vrcManager;
-  private DiscordManager? _discordManager;
+  private DiscordWebhookManager? _discordManager;
 
   public bool IsInitialized => _isInitialized;
 
@@ -43,8 +43,8 @@ public class UserManager : Registry<User>, IManager
     if (_core.HasManager<VRCManager>())
       _vrcManager = _core.GetManagerOrDefault<VRCManager>();
 
-    if (_core.HasManager<DiscordManager>())
-      _discordManager = _core.GetManagerOrDefault<DiscordManager>();
+    if (_core.HasManager<DiscordWebhookManager>())
+      _discordManager = _core.GetManagerOrDefault<DiscordWebhookManager>();
   }
 
   public void Initialize()
