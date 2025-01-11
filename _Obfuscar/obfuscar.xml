@@ -1,0 +1,41 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Include>
+  <Var name="RegenerateDebugInfo" value="false" />
+  <Var name="MarkedOnly" value="false" />
+  <Var name="RenameProperties" value="true" />
+  <Var name="RenameEvents" value="true" />
+  <Var name="RenameFields" value="true" />
+  <Var name="KeepPublicApi" value="false" />
+  <Var name="HidePrivateApi" value="true" />
+  <Var name="ReuseNames" value="true" />
+  <Var name="HideStrings" value="true" />
+  <Var name="OptimizeMethods" value="true" />
+  <Var name="SuppressIldasm" value="true" />
+  <Var name="AnalyzeXaml" value="false" />
+  <Var name="UseUnicodeNames" value="false" />
+  <Var name="UseKoreanNames" value="false" />
+  <Module file="$(InPath)\Eqipa.dll">
+    <SkipType name="*AnonymousType*" skipProperties="true" skipMethods="true" skipFields="true" skipEvents="true" skipStringHiding="true" />
+  </Module>
+  <AssemblySearchPath path="C:\Program Files\dotnet\packs\Microsoft.NETCore.App.Ref\8.0.10\ref\net8.0\" />
+  <AssemblySearchPath path="C:\Program Files\dotnet\packs\Microsoft.WindowsDesktop.App.Ref\8.0.10\ref\net8.0\" />
+  <AssemblySearchPath path="C:\Users\norbe\.nuget\packages\embedio\3.5.2\lib\netstandard2.0\" />
+  <AssemblySearchPath path="C:\Users\norbe\.nuget\packages\jsonsubtypes\1.9.0\lib\netstandard2.0\" />
+  <AssemblySearchPath path="C:\Users\norbe\.nuget\packages\lucheart.coreosc\1.4.0\lib\net8.0\" />
+  <AssemblySearchPath path="C:\Users\norbe\.nuget\packages\meamod.dns\1.0.71\lib\net7.0\" />
+  <AssemblySearchPath path="C:\Users\norbe\.nuget\packages\microsoft.cognitiveservices.speech\1.42.0\lib\netstandard2.0\" />
+  <AssemblySearchPath path="C:\Users\norbe\.nuget\packages\naudio.asio\2.2.1\lib\netstandard2.0\" />
+  <AssemblySearchPath path="C:\Users\norbe\.nuget\packages\naudio.core\2.2.1\lib\netstandard2.0\" />
+  <AssemblySearchPath path="C:\Users\norbe\.nuget\packages\naudio.midi\2.2.1\lib\netstandard2.0\" />
+  <AssemblySearchPath path="C:\Users\norbe\.nuget\packages\naudio.wasapi\2.2.1\lib\netstandard2.0\" />
+  <AssemblySearchPath path="C:\Users\norbe\.nuget\packages\naudio.winforms\2.2.1\lib\netcoreapp3.1\" />
+  <AssemblySearchPath path="C:\Users\norbe\.nuget\packages\naudio.winmm\2.2.1\lib\netstandard2.0\" />
+  <AssemblySearchPath path="C:\Users\norbe\.nuget\packages\naudio\2.2.1\lib\net6.0-windows7.0\" />
+  <AssemblySearchPath path="C:\Users\norbe\.nuget\packages\newtonsoft.json\13.0.3\lib\net6.0\" />
+  <AssemblySearchPath path="C:\Users\norbe\.nuget\packages\oscquerylibrary\1.1.2\lib\net8.0\" />
+  <AssemblySearchPath path="C:\Users\norbe\.nuget\packages\polly\7.2.3\lib\netstandard2.0\" />
+  <AssemblySearchPath path="C:\Users\norbe\.nuget\packages\restsharp\108.0.2\lib\net6.0\" />
+  <AssemblySearchPath path="C:\Users\norbe\.nuget\packages\serilog\4.1.0\lib\net8.0\" />
+  <AssemblySearchPath path="C:\Users\norbe\.nuget\packages\unosquare.swan.lite\3.1.0\lib\netstandard2.0\" />
+  <AssemblySearchPath path="C:\Users\norbe\.nuget\packages\vrchat.api\1.18.8\lib\netstandard2.0\" />
+</Include>
