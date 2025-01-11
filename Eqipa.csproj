@@ -16,6 +16,17 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
     <DebugType>none</DebugType>
   </PropertyGroup>
+  <ItemGroup>
+    <Compile Remove="Eqipa\Manager\**" />
+    <Compile Remove="Eqipa\Model\**" />
+    <Compile Remove="Eqipa\Module\**" />
+    <EmbeddedResource Remove="Eqipa\Manager\**" />
+    <EmbeddedResource Remove="Eqipa\Model\**" />
+    <EmbeddedResource Remove="Eqipa\Module\**" />
+    <None Remove="Eqipa\Manager\**" />
+    <None Remove="Eqipa\Model\**" />
+    <None Remove="Eqipa\Module\**" />
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Discord.Net" Version="3.17.0" />
@@ -36,11 +47,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Eqipa\Model\" />
-    <Folder Include="Eqipa\Module\" />
     <Folder Include="Eqipa\Dialogs\" />
-    <Folder Include="Eqipa\Manager\" />
-    <Folder Include="Eqipa\Module\Internal\" />
     <Folder Include="Eqipa.OSC\" />
     <Folder Include="Eqipa.Discord\" />
   </ItemGroup>

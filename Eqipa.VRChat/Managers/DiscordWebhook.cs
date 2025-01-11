@@ -1,8 +1,8 @@
+using Swan;
 using System.Net.Http.Json;
 using Eqipa.Util;
 using Eqipa.Model;
 using static Eqipa.Util.ColorUtil;
-using Swan;
 
 namespace Eqipa.Manager;
 
