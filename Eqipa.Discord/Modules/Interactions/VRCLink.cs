@@ -204,7 +204,7 @@ public class VRCLinkInteractionModule : InteractionModuleBase<SocketInteractionC
   {
     Logger.Log(LogLevel.Info, $"Handling VRC ID modal with user ID: {modal.VrcId}");
 
-    if (!IsUserVerified(modal.VrcId!))
+    if (IsUserVerified(modal.VrcId!))
     {
       Logger.Log(LogLevel.Warn, $"Someone tried to verify while being verified by someone else: {modal.VrcId}");
       await RespondAsync("Te konto już zostało zweryfikowane przez innego użytkownika.", ephemeral: true);
@@ -224,7 +224,7 @@ public class VRCLinkInteractionModule : InteractionModuleBase<SocketInteractionC
     if (user is null)
     {
       Logger.Log(LogLevel.Warn, $"No profile found in the database for user: {modal.VrcId}");
-      await RespondAsync("Nie znaleziono profilu w bazie, najpierw dołącz na instancję Eqipa i dopiero później spróbuj zweryfikować się ponownie", ephemeral: true);
+      await RespondAsync("Nie znaleziono profilu w bazie, najpierw dołącz na instancję grupy Eqipa i dopiero później spróbuj zweryfikować się ponownie", ephemeral: true);
       return;
     }
 
