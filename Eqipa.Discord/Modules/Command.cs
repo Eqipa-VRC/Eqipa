@@ -117,16 +117,53 @@ public class CommandModule
     try
     {
       var context = new SocketInteractionContext(_client, interaction);
-      var result = await _interactionService.ExecuteCommandAsync(context, _serviceProvider);
 
-      if (!result.IsSuccess)
+      switch (interaction.Type)
       {
-        Logger.Log(LogLevel.Error, $"Interaction error: {result.ErrorReason}");
 
-        if (interaction.Type == InteractionType.ApplicationCommand)
+        // Handling Slash Command Interactions
+        case InteractionType.ApplicationCommand:
+          {
+            // You can process the slash command interaction here
+            var slashCommandResult = await _interactionService.ExecuteCommandAsync(context, _serviceProvider);
+
+            if (!slashCommandResult.IsSuccess)
+            {
+              Logger.Log(LogLevel.Error, $"Application command interaction error: {slashCommandResult.ErrorReason}");
+              await interaction.RespondAsync($"Błąd: {slashCommandResult.ErrorReason}", ephemeral: true);
+            }
+            break;
+          }
+
+        case InteractionType.MessageComponent:
+          {
+            var messageComponentResult = await _interactionService.ExecuteCommandAsync(context, _serviceProvider);
+
+            if (!messageComponentResult.IsSuccess)
+            {
+              Logger.Log(LogLevel.Error, $"Application component error: {messageComponentResult.ErrorReason}");
+              await interaction.RespondAsync($"Błąd: {messageComponentResult.ErrorReason}", ephemeral: true);
+            }
+            break;
+          }
+
+        case InteractionType.ModalSubmit:
         {
-          await interaction.RespondAsync($"Błąd: {result.ErrorReason}", ephemeral: true);
+          var modalSubmitResult = await _interactionService.ExecuteCommandAsync(context, _serviceProvider);
+
+          if (!modalSubmitResult.IsSuccess)
+          {
+            Logger.Log(LogLevel.Error, $"Application modal error: {modalSubmitResult.ErrorReason}");
+            await interaction.RespondAsync($"Błąd: {modalSubmitResult.ErrorReason}", ephemeral: true);
+          }
+          break;
         }
+
+        default:
+          // If the interaction type is unhandled, you can log or respond accordingly
+          Logger.Log(LogLevel.Warn, $"Unhandled interaction type: {interaction.Type}");
+          await interaction.RespondAsync("Nierozpoznany typ interakcji.", ephemeral: true);
+          break;
       }
     }
     catch (Exception ex)
@@ -135,6 +172,10 @@ public class CommandModule
       if (interaction.Type == InteractionType.ApplicationCommand)
       {
         await interaction.RespondAsync("Błąd podczas przetwarzania zadań komendy, skontaktuj się z administracją", ephemeral: true);
+      }
+      else if (interaction.Type == InteractionType.ModalSubmit)
+      {
+        await interaction.RespondAsync("Wystąpił błąd przy przetwarzaniu formularza. Spróbuj ponownie później.", ephemeral: true);
       }
     }
   }

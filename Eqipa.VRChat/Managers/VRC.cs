@@ -39,6 +39,7 @@ public class VRCManager : ApiClient, IAsyncManager
   public UsersApi? Users { get; private set; }
   public GroupsApi? Groups { get; private set; }
   public Group? Group { get; private set; }
+  public FriendsApi? Friends { get; private set; }
 
   public CurrentUser? User { get; private set; }
   public VRCLogReader? LogReader { get; private set; }
@@ -70,6 +71,7 @@ public class VRCManager : ApiClient, IAsyncManager
 
     Users = new(this, this, _vrcConfig);
     Groups = new(this, this, _vrcConfig);
+    Friends = new(this, this, _vrcConfig);
 
     _worldId = _vrchatBot.Config.GetConfig<string?>(c => c.VrchatWorldId!);
     _groupId = _vrchatBot.Config.GetConfig<string?>(c => c.VrchatGroupId!);
@@ -81,7 +83,7 @@ public class VRCManager : ApiClient, IAsyncManager
     if (_isInitialized)
       throw new ManagerAlreadyInitializedException(GetType());
 
-    // Login();
+    Login();
 
     OSC = new(_vrchatBot);
     LogReader = new(_vrchatBot);
@@ -189,7 +191,7 @@ public class VRCManager : ApiClient, IAsyncManager
     text = ReplaceFirst(text, "{maxpi}", _groupMaxUsers);
     text = ReplaceFirst(text, "{online}", _groupUsers);
     text = ReplaceFirst(text, "{admins}", _groupAdmins);
-    text = ReplaceFirst(text, "{percent}", Math.Floor((double) (_groupUsers / _groupMaxUsers) * 100));
+    text = ReplaceFirst(text, "{percent}", PercentageConverter.Convert(_groupUsers, 0, _groupMaxUsers));
     // text = ReplaceFirst()
 
     return text;

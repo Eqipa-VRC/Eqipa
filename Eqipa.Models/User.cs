@@ -69,7 +69,7 @@ public class User
   public string? FirstName { get; set; } = null;
 
   [JsonProperty("discordId")]
-  public string? DiscordId { get; set; } = null;
+  public ulong? DiscordId { get; set; } = null;
 
   [JsonProperty("penalties")]
   public List<UserPenalty>? Penalties { get; set; } = new();

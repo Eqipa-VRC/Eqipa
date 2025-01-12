@@ -31,9 +31,9 @@ public class VRChatBot : Singleton<VRChatBot>, IDisposable
     Logger.Log(LogLevel.Step, "Registering managers...");
 
     RegisterManager(new DiscordWebhookManager(this));
-    // RegisterManager(new VRCManager(this));
-    // RegisterManager(new UserManager(this));
-    // RegisterManager(new VRCInstanceManager(this));
+    RegisterManager(new VRCManager(this));
+    RegisterManager(new UserManager(this));
+    RegisterManager(new VRCInstanceManager(this));
   }
 
   private async void Initialize()
