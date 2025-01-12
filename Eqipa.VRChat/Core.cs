@@ -19,6 +19,7 @@ public class VRChatBot : Singleton<VRChatBot>, IDisposable
 
   private readonly Dictionary<Type, IManager> _managers = new();
   private readonly CancellationTokenSource _updateLoopCancellation = new();
+  
   private Task? _updateLoopTask;
   private bool _isInitialized = false;
   private bool _isDisposed = false;

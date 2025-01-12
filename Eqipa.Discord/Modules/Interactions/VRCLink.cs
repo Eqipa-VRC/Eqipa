@@ -12,11 +12,8 @@ namespace Eqipa.Discord.Modules.Interactions;
 public class VRCLinkInteractionModule : InteractionModuleBase<SocketInteractionContext>
 {
   private const string MODAL_ID = "vrc-id-link";
+  private static readonly Dictionary<ulong, DateTimeOffset> CanceledUsers = new();
 
-  // Dictionary to store cancellation timestamps
-  private static readonly Dictionary<ulong, DateTimeOffset> CanceledUsers = new Dictionary<ulong, DateTimeOffset>();
-
-  // Modal class for VRC ID input
   public class VrcIdModal : IModal
   {
     public string Title => "Podaj swój identyfikator profilowy VRChat";
@@ -26,7 +23,6 @@ public class VRCLinkInteractionModule : InteractionModuleBase<SocketInteractionC
     public string? VrcId { get; set; }
   }
 
-  // Method to validate VRChat User ID
   private bool IsValidVRCUserId(string vrcUserId)
   {
     string pattern = @"^usr_[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$";
@@ -84,24 +80,21 @@ public class VRCLinkInteractionModule : InteractionModuleBase<SocketInteractionC
 
   private async Task<bool> WaitForFriendAcceptance(string vrcUserId)
   {
-    var interval = 15000; // Check every 15 seconds
-    var timeout = 30000; // 30 seconds max wait time
+    var interval = 5000;
+    var timeout = 30000;
     var elapsedTime = 0;
 
     while (elapsedTime < timeout)
     {
-      await Task.Delay(interval); // Wait for the interval
+      await Task.Delay(interval);
 
-      // Check if friend request has been accepted
       if (DidUserAccepted(vrcUserId))
-      {
-        return true; // User accepted the request
-      }
+        return true;
 
       elapsedTime += interval;
     }
 
-    return false; // Timeout, user did not accept the request
+    return false;
   }
 
   private bool UpdateUser(string vrcUserId, ulong discordId)
@@ -119,10 +112,25 @@ public class VRCLinkInteractionModule : InteractionModuleBase<SocketInteractionC
     return false;
   }
 
+  private bool IsUserVerified(string vrcUserId)
+  {
+    if (!Program.VRChatBot!.HasManager<UserManager>())
+      return false;
+
+    var manager = Program.VRChatBot.GetManager<UserManager>();
+    if (manager.Has(vrcUserId))
+    {
+      var data = manager.Get(vrcUserId);
+      if (data!.DiscordId is not null)
+        return true;
+    }
+
+    return false;
+  }
+
   [SlashCommand("vrc-link", "Zweryfikuj swoje konto VRChat z naszym Discordem")]
   public async Task StartAsync()
   {
-    // If user has canceled and cooldown hasn't passed, show the remaining time
     if (CanceledUsers.ContainsKey(Context.User.Id))
     {
       var cooldownTime = CanceledUsers[Context.User.Id];
@@ -130,13 +138,11 @@ public class VRCLinkInteractionModule : InteractionModuleBase<SocketInteractionC
 
       if (remainingTime > TimeSpan.Zero)
       {
-        // Show a countdown message with the remaining time
         await RespondAsync($"Anulowałeś wcześniej proces weryfikacji. Możesz spróbować ponownie za {remainingTime.Minutes} minut i {remainingTime.Seconds} sekund.", ephemeral: true);
         return;
       }
       else
       {
-        // Remove the user from the canceled list after cooldown
         CanceledUsers.Remove(Context.User.Id);
       }
     }
@@ -170,14 +176,12 @@ public class VRCLinkInteractionModule : InteractionModuleBase<SocketInteractionC
   [ComponentInteraction("vrc-link-modal-no")]
   public async Task CancelAsync()
   {
-    // If user has already canceled, notify them
     if (CanceledUsers.ContainsKey(Context.User.Id))
     {
       await RespondAsync("Anulowałeś wcześniej proces weryfikacji. Nie możesz zrobić tego ponownie.", ephemeral: true);
       return;
     }
 
-    // Track the cancellation time
     CanceledUsers[Context.User.Id] = DateTimeOffset.Now;
 
     var embed = new EmbedBuilder()
@@ -198,10 +202,15 @@ public class VRCLinkInteractionModule : InteractionModuleBase<SocketInteractionC
   [ModalInteraction(MODAL_ID)]
   public async Task HandleVRCIdAsync(VrcIdModal modal)
   {
-    // Debug log for the received VRChat user ID
     Logger.Log(LogLevel.Info, $"Handling VRC ID modal with user ID: {modal.VrcId}");
 
-    // Validate VRChat ID format using regex
+    if (!IsUserVerified(modal.VrcId!))
+    {
+      Logger.Log(LogLevel.Warn, $"Someone tried to verify while being verified by someone else: {modal.VrcId}");
+      await RespondAsync("Te konto już zostało zweryfikowane przez innego użytkownika.", ephemeral: true);
+      return;
+    }
+
     if (!IsValidVRCUserId(modal.VrcId!))
     {
       Logger.Log(LogLevel.Warn, $"Invalid VRChat ID format for user: {modal.VrcId}");
@@ -209,7 +218,6 @@ public class VRCLinkInteractionModule : InteractionModuleBase<SocketInteractionC
       return;
     }
 
-    // Debug log for successful format validation
     Logger.Log(LogLevel.Info, $"Valid VRChat ID format for user: {modal.VrcId}");
 
     var user = GetUserByVrcId(modal.VrcId!);
@@ -220,10 +228,8 @@ public class VRCLinkInteractionModule : InteractionModuleBase<SocketInteractionC
       return;
     }
 
-    // Debug log when user is found
     Logger.Log(LogLevel.Info, $"User found in database for VRChat ID: {modal.VrcId}");
 
-    // Send friend request to the user in VRChat
     var friendRequestResult = InviteToFriendByUserId(modal.VrcId!);
     if (!friendRequestResult)
     {
@@ -232,13 +238,9 @@ public class VRCLinkInteractionModule : InteractionModuleBase<SocketInteractionC
       return;
     }
 
-    // Debug log for successful friend request
     Logger.Log(LogLevel.Info, $"Friend request successfully sent to VRChat user: {modal.VrcId}");
-
-    // Inform the user that they need to accept the friend request
     await RespondAsync("Wysłaliśmy zaproszenie do znajomych w VRChat. Proszę zaakceptuj zaproszenie, aby kontynuować weryfikację.", ephemeral: true);
 
-    // Start checking for friend request acceptance
     Logger.Log(LogLevel.Info, $"Starting to wait for friend acceptance for user: {modal.VrcId}");
     var verificationAccepted = await WaitForFriendAcceptance(modal.VrcId!);
 
@@ -254,16 +256,12 @@ public class VRCLinkInteractionModule : InteractionModuleBase<SocketInteractionC
         return;
       }
 
-      // Debug log when user is successfully updated
       Logger.Log(LogLevel.Info, $"User data updated successfully for VRChat ID: {modal.VrcId}");
 
-      // Inform user that verification is complete
+      await DeferAsync(ephemeral: true);
+
       try
       {
-        // Acknowledge the interaction immediately
-        await DeferAsync(ephemeral: true);
-
-        // Create the embed for DM
         var embed = new EmbedBuilder()
             .WithTitle("Weryfikacja zakończona")
             .WithDescription("Twoje konto VRChat zostało zweryfikowane i połączone z Twoim kontem Discord.")
@@ -271,10 +269,7 @@ public class VRCLinkInteractionModule : InteractionModuleBase<SocketInteractionC
             .WithFooter("Dziękujemy za weryfikację")
             .WithTimestamp(DateTimeOffset.Now);
 
-        // Send DM to user
         await Context.User.SendMessageAsync(embed: embed.Build());
-
-        // Use FollowupAsync to finalize the response
         await FollowupAsync("Weryfikacja zakończona pomyślnie. Wysłałem ci szczegóły w prywatnej wiadomości.", ephemeral: true);
 
         Logger.Log(LogLevel.Info, $"Verification DM sent successfully to user: {Context.User.Id}");
@@ -282,8 +277,6 @@ public class VRCLinkInteractionModule : InteractionModuleBase<SocketInteractionC
       catch (Exception ex)
       {
         Logger.Log(LogLevel.Error, $"Failed to send DM to user {Context.User.Id}: {ex.Message}");
-
-        // Use FollowupAsync for final message in case of failure
         await FollowupAsync("Weryfikacja zakończona pomyślnie, ale nie mogę wysyłać ci prywatnej wiadomości. Upewnij się, że masz włączone przyjmowanie wiadomości prywatnych.", ephemeral: true);
       }
     }

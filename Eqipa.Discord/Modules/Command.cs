@@ -120,11 +120,8 @@ public class CommandModule
 
       switch (interaction.Type)
       {
-
-        // Handling Slash Command Interactions
         case InteractionType.ApplicationCommand:
           {
-            // You can process the slash command interaction here
             var slashCommandResult = await _interactionService.ExecuteCommandAsync(context, _serviceProvider);
 
             if (!slashCommandResult.IsSuccess)
