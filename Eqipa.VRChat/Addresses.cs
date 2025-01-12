@@ -1,6 +1,6 @@
-using Eqipa.Module.Internal;
+using Eqipa.VRChat.Module;
 
-namespace Eqipa;
+namespace Eqipa.VRChat;
 
 internal static class Addresses
 {

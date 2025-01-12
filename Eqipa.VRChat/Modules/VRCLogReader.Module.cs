@@ -1,12 +1,12 @@
 using System.Diagnostics;
 using System.Text;
 using System.Text.RegularExpressions;
-using Eqipa.Model;
 using Eqipa.Util;
+using Eqipa.VRChat.Model;
 using static Eqipa.Constants;
 using static Eqipa.Util.ProcessUtil;
 
-namespace Eqipa.Module.Internal;
+namespace Eqipa.VRChat.Module;
 
 public class VRCLogReader
 {

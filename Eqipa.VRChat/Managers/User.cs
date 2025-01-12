@@ -7,8 +7,9 @@ using VRChat.API.Client;
 using User = Eqipa.Model.User;
 using UserStatus = Eqipa.Model.UserStatus;
 using static Eqipa.Constants;
+using Eqipa.VRChat.Model;
 
-namespace Eqipa.Manager;
+namespace Eqipa.VRChat.Manager;
 
 public class UserManager : Registry<User>, IManager
 {

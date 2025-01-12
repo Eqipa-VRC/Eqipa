@@ -1,6 +1,6 @@
 using Newtonsoft.Json;
 
-namespace Eqipa.Model;
+namespace Eqipa.VRChat.Model;
 
 public enum VRCModerationType
 {

@@ -1,8 +1,9 @@
 using Eqipa.Util;
 using Eqipa.Model;
-using Eqipa.Module.Internal;
+using Eqipa.VRChat.Module;
+using Eqipa.VRChat.Model;
 
-namespace Eqipa.Manager;
+namespace Eqipa.VRChat.Manager;
 
 public class VRCInstanceManager : IManager
 {

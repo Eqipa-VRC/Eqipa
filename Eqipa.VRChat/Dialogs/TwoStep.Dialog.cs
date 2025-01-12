@@ -1,6 +1,6 @@
 using Eqipa.Util;
 
-namespace Eqipa.Dialogs;
+namespace Eqipa.VRChat.Dialogs;
 
 public class TwoStepDialog : Dialog
 {

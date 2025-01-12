@@ -17,6 +17,7 @@
     <DebugType>none</DebugType>
   </PropertyGroup>
 
+
   <ItemGroup>
     <PackageReference Include="Discord.Net" Version="3.17.0" />
     <PackageReference Include="Discord.Net.Commands" Version="3.17.0" />
@@ -37,13 +38,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Eqipa\" />
     <Folder Include="Eqipa.OSC\" />
     <Folder Include="Eqipa.Utils\" />
     <Folder Include="Eqipa.Models\" />
     <Folder Include="Eqipa.VRChat\" />
     <Folder Include="Eqipa.Discord\" />
-    <Folder Include="Eqipa\Dialogs\" />
   </ItemGroup>
 
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">

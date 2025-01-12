@@ -1,9 +1,9 @@
-using Eqipa.Manager;
 using Eqipa.Model;
 using Eqipa.Util;
 using Eqipa.Discord;
+using Eqipa.VRChat.Manager;
 
-namespace Eqipa;
+namespace Eqipa.VRChat;
 
 public class VRChatBot : Singleton<VRChatBot>, IDisposable
 {

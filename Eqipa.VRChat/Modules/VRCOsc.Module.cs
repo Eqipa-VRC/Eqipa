@@ -4,7 +4,8 @@ using OscQueryLibrary.Utils;
 using Eqipa.OSC;
 using Eqipa.Util;
 
-namespace Eqipa.Module.Internal;
+namespace Eqipa.VRChat.Module;
+
 public enum VRCOscAddresses
 {
   SET_CHATBOX_TYPING,

@@ -1,4 +1,5 @@
 ﻿using Eqipa.Util;
+using Eqipa.VRChat;
 using static Eqipa.Constants;
 
 namespace Eqipa;

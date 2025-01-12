@@ -1,4 +1,4 @@
-namespace Eqipa.Model;
+namespace Eqipa.VRChat.Model;
 
 public class ProcessedLogEventArgs : EventArgs
 {

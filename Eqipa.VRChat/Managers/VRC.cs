@@ -4,14 +4,15 @@ using VRChat.API.Model;
 using VRChat.API.Client;
 using Eqipa.Util;
 using Eqipa.Model;
-using Eqipa.Dialogs;
-using Eqipa.Module.Internal;
-using static Eqipa.Addresses;
 using static Eqipa.Constants;
 using Logger = Eqipa.Util.Logger;
 using Configuration = VRChat.API.Client.Configuration;
+using Eqipa.VRChat.Module;
+using UserStatus = Eqipa.Model.UserStatus;
+using Eqipa.VRChat.Dialogs;
+using static Eqipa.VRChat.Addresses;
 
-namespace Eqipa.Manager;
+namespace Eqipa.VRChat.Manager;
 
 public class VRCManager : ApiClient, IAsyncManager
 {
@@ -93,8 +94,8 @@ public class VRCManager : ApiClient, IAsyncManager
     if (!_isInitialized || _isDisposed)
       return;
 
-    _groupUsers = _isLogged ? _userManager!.GetCountByCondition(u => u.Status is Model.UserStatus.Online) : 1;
-    _groupAdmins = _isLogged ? _userManager!.GetCountByCondition(u => u.Admin && u.Status is Model.UserStatus.Online) : 1;
+    _groupUsers = _isLogged ? _userManager!.GetCountByCondition(u => u.Status is UserStatus.Online) : 1;
+    _groupAdmins = _isLogged ? _userManager!.GetCountByCondition(u => u.Admin && u.Status is UserStatus.Online) : 1;
 
     if ((DateTime.UtcNow - _lastOSCUpdate).TotalSeconds >= 5)
     {

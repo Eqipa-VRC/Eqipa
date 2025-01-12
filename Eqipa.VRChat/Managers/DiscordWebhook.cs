@@ -4,7 +4,7 @@ using Eqipa.Util;
 using Eqipa.Model;
 using static Eqipa.Util.ColorUtil;
 
-namespace Eqipa.Manager;
+namespace Eqipa.VRChat.Manager;
 
 public class DiscordWebhookManager : IManager
 {
