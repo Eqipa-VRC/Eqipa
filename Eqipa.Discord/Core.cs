@@ -152,7 +152,7 @@ public class DiscordBot : Singleton<DiscordBot>, IDisposable
     Dispose(false);
   }
 
-  public async Task SetRichPresenceAsync(string details, ActivityType activityType)
+  public async Task SetRichPresenceAsync(string details)
   {
     ThrowIfDisposed();
 
@@ -161,8 +161,15 @@ public class DiscordBot : Singleton<DiscordBot>, IDisposable
       throw new InvalidOperationException("DiscordBot must be initialized before setting Rich Presence.");
     }
 
-    await _client!.SetActivityAsync(new Game("Eqipa", activityType, ActivityProperties.Join, details));
-    Logger.Log(LogLevel.Info, $"Updated Rich Presence to '{activityType} {details}'");
+    try
+    {
+      await _client!.SetCustomStatusAsync(details);
+      Logger.Log(LogLevel.Info, $"Updated Rich Presence to '{details}'");
+    }
+    catch (Exception e)
+    {
+      Logger.Log(LogLevel.Warn, $"Cannot set presence: {e.Message}");
+    }
   }
 
   private async void UpdateRichPresenceRandomly(object? state)
@@ -174,12 +181,19 @@ public class DiscordBot : Singleton<DiscordBot>, IDisposable
       return;
     }
 
-    var manager = Program.VRChatBot!.GetManagerOrDefault<VRCManager>();
+    var manager = Program.VRChatBot?.GetManagerOrDefault<VRCManager>();
+    int onlineUsers = manager?.GroupUsers ?? 0;
+    int maxUsers = manager?.GroupMaxUsers ?? 0;
 
-    var randomPresence = _richPresenceMessages[Random.Shared.Next(_richPresenceMessages.Count)];
-    randomPresence.Message = StringUtil.Replace(randomPresence.Message, "{online}", manager is not null ? manager.GroupUsers : 0);
-    randomPresence.Message = StringUtil.Replace(randomPresence.Message, "{maxpi}", manager is not null ? manager.GroupMaxUsers : 0);
+    var randomIndex = Random.Shared.Next(_richPresenceMessages.Count);
+    var (messageTemplate, activityType) = _richPresenceMessages[randomIndex];
 
-    await SetRichPresenceAsync(randomPresence.Message, randomPresence.Type);
+    var updatedMessage = messageTemplate
+        .Replace("{online}", onlineUsers.ToString())
+        .Replace("{maxpi}", maxUsers.ToString());
+
+    await SetRichPresenceAsync(updatedMessage);
+
+    Logger.Log(LogLevel.Info, $"Updated Rich Presence to: {updatedMessage} ({activityType})");
   }
 }
