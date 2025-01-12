@@ -22,7 +22,7 @@ public class DiscordBot : Singleton<DiscordBot>, IDisposable
 
   private readonly List<(string Message, ActivityType Type)> _richPresenceMessages = new()
   {
-    ("{online}/{maxpi} dostępnych osób na instancjach", ActivityType.CustomStatus),
+    ("{online}/{maxpi} dostępnych osób na instancjach", ActivityType.Watching),
   };
 
   public bool IsInitialized => _isInitialized;
@@ -76,13 +76,12 @@ public class DiscordBot : Singleton<DiscordBot>, IDisposable
   private async Task OnReady()
   {
     _presenceUpdateTimer = new Timer(UpdateRichPresenceRandomly, null, TimeSpan.Zero, TimeSpan.FromMinutes(1));
+    UpdateRichPresenceRandomly(null);
     Logger.Log(LogLevel.Info, "Bot is ready and connected to Discord.");
 
-    // Register commands globally or per guild
     try
     {
       await _commandModule!.RegisterCommandsGloballyAsync();
-      Logger.Log(LogLevel.Info, "Registered commands");
     }
     catch (Exception e)
     {
@@ -94,7 +93,6 @@ public class DiscordBot : Singleton<DiscordBot>, IDisposable
   {
     var services = new ServiceCollection();
 
-    // Register required services
     services.AddSingleton(_client!);
     services.AddSingleton<CommandModule>();
     services.AddSingleton<CommandService>();
@@ -154,7 +152,7 @@ public class DiscordBot : Singleton<DiscordBot>, IDisposable
     Dispose(false);
   }
 
-  public async Task SetRichPresenceAsync(string details, ActivityType activityType, string? url = null)
+  public async Task SetRichPresenceAsync(string details, ActivityType activityType)
   {
     ThrowIfDisposed();
 
@@ -163,7 +161,7 @@ public class DiscordBot : Singleton<DiscordBot>, IDisposable
       throw new InvalidOperationException("DiscordBot must be initialized before setting Rich Presence.");
     }
 
-    await _client!.SetActivityAsync(new Game(details, activityType));
+    await _client!.SetActivityAsync(new Game("Eqipa", activityType, ActivityProperties.Join, details));
     Logger.Log(LogLevel.Info, $"Updated Rich Presence to '{activityType} {details}'");
   }
 
