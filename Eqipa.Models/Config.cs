@@ -42,8 +42,8 @@ public class Configuration
   [JsonProperty("speechRecognizer.region")]
   public string? SpeechRecognizerRegion { get; set; } = "northeurope";
 
-  [JsonProperty("speechRecognizer.language")]
-  public RecognizeLang SpeechRecognizerLanguage { get; set; } = RecognizeLang.Polish;
+  // [JsonProperty("speechRecognizer.language")]
+  // public RecognizeLang SpeechRecognizerLanguage { get; set; } = RecognizeLang.Polish;
 }
 
 public class Config
