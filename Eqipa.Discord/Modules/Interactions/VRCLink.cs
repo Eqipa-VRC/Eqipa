@@ -12,6 +12,10 @@ namespace Eqipa.Discord.Modules.Interactions;
 public class VRCLinkInteractionModule : InteractionModuleBase<SocketInteractionContext>
 {
   private const string MODAL_ID = "vrc-id-link";
+  private const string MODAL_TEXT = "vrc-id-text";
+  private const string MODAL_ACCEPT = "vrc-id-accept";
+  private const string MODAL_CANCEL = "vrc-id-cancel";
+
   private static readonly Dictionary<ulong, DateTimeOffset> CanceledUsers = new();
 
   public class VrcIdModal : IModal
@@ -19,7 +23,7 @@ public class VRCLinkInteractionModule : InteractionModuleBase<SocketInteractionC
     public string Title => "Podaj swój identyfikator profilowy VRChat";
 
     [InputLabel("VRChat ID")]
-    [ModalTextInput("vrc-id", TextInputStyle.Short, placeholder: "Wpisz swój identyfikator VRChat")]
+    [ModalTextInput(MODAL_TEXT, TextInputStyle.Short, placeholder: "Wpisz swój identyfikator VRChat")]
     public string? VrcId { get; set; }
   }
 
@@ -156,24 +160,24 @@ public class VRCLinkInteractionModule : InteractionModuleBase<SocketInteractionC
         .WithFooter("Zatwierdź, klikając przycisk poniżej");
 
     var builder = new ComponentBuilder()
-        .WithButton("Tak", "vrc-link-modal-yes", ButtonStyle.Success)
-        .WithButton("Nie", "vrc-link-modal-no", ButtonStyle.Danger);
+        .WithButton("Tak", MODAL_ACCEPT, ButtonStyle.Success)
+        .WithButton("Nie", MODAL_CANCEL, ButtonStyle.Danger);
 
     await RespondAsync("Czy chciałbyś rozpocząć proces weryfikacji profilu VRChat z naszym Discordem?", embed: embed.Build(), components: builder.Build(), ephemeral: true);
   }
 
-  [ComponentInteraction("vrc-link-modal-yes")]
+  [ComponentInteraction(MODAL_ACCEPT)]
   public async Task ShowModalAsync()
   {
     var modal = new ModalBuilder()
         .WithTitle("Podaj swój identyfikator profilowy VRChat")
         .WithCustomId(MODAL_ID)
-        .AddTextInput("VRChat ID", "vrc-id", TextInputStyle.Short, placeholder: "Wpisz swój identyfikator VRChat");
+        .AddTextInput("VRChat ID", MODAL_TEXT, TextInputStyle.Short, placeholder: "Wpisz swój identyfikator VRChat");
 
     await RespondWithModalAsync(modal.Build());
   }
 
-  [ComponentInteraction("vrc-link-modal-no")]
+  [ComponentInteraction(MODAL_CANCEL)]
   public async Task CancelAsync()
   {
     if (CanceledUsers.ContainsKey(Context.User.Id))
@@ -191,11 +195,7 @@ public class VRCLinkInteractionModule : InteractionModuleBase<SocketInteractionC
         .WithFooter("Weryfikacja anulowana")
         .WithTimestamp(DateTimeOffset.Now);
 
-    var builder = new ComponentBuilder()
-        .WithButton("Tak", "vrc-link-modal-yes", ButtonStyle.Success, null, null, true)
-        .WithButton("Nie", "vrc-link-modal-no", ButtonStyle.Danger, null, null, true);
-
-    await FollowupAsync("Proces weryfikacji został anulowany. Możesz spróbować ponownie za 10 minut.", embed: embed.Build(), components: builder.Build(), ephemeral: true);
+    await FollowupAsync("Proces weryfikacji został anulowany. Możesz spróbować ponownie za 10 minut.", embed: embed.Build(), ephemeral: true);
     await RespondAsync("Anulowano weryfikację profilu VRChat", ephemeral: true);
   }
 

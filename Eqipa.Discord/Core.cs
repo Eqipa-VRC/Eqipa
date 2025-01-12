@@ -5,7 +5,8 @@ using Discord.WebSocket;
 using Eqipa.Util;
 using Eqipa.Discord.Modules;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.VisualBasic.Logging;
+using Timer = System.Threading.Timer;
+using Eqipa.VRChat.Manager;
 
 namespace Eqipa.Discord;
 
@@ -14,9 +15,15 @@ public class DiscordBot : Singleton<DiscordBot>, IDisposable
   private CommandModule? _commandModule;
   private IServiceProvider? _serviceProvider;
   private DiscordSocketClient? _client;
+  private Timer? _presenceUpdateTimer;
 
   private bool _isInitialized = false;
   private bool _isDisposed = false;
+
+  private readonly List<(string Message, ActivityType Type)> _richPresenceMessages = new()
+  {
+    ("{online}/{maxpi} dostępnych osób na instancjach", ActivityType.CustomStatus),
+  };
 
   public bool IsInitialized => _isInitialized;
 
@@ -68,6 +75,7 @@ public class DiscordBot : Singleton<DiscordBot>, IDisposable
 
   private async Task OnReady()
   {
+    _presenceUpdateTimer = new Timer(UpdateRichPresenceRandomly, null, TimeSpan.Zero, TimeSpan.FromMinutes(1));
     Logger.Log(LogLevel.Info, "Bot is ready and connected to Discord.");
 
     // Register commands globally or per guild
@@ -80,7 +88,6 @@ public class DiscordBot : Singleton<DiscordBot>, IDisposable
     {
       Logger.Log(LogLevel.Error, $"{e.Message}\n{e.StackTrace}");
     }
-    // Alternatively: await _commandModule.RegisterCommandsToGuildAsync(guildId);
   }
 
   private IServiceProvider ConfigureServices()
@@ -145,5 +152,36 @@ public class DiscordBot : Singleton<DiscordBot>, IDisposable
   ~DiscordBot()
   {
     Dispose(false);
+  }
+
+  public async Task SetRichPresenceAsync(string details, ActivityType activityType, string? url = null)
+  {
+    ThrowIfDisposed();
+
+    if (!_isInitialized)
+    {
+      throw new InvalidOperationException("DiscordBot must be initialized before setting Rich Presence.");
+    }
+
+    await _client!.SetActivityAsync(new Game(details, activityType));
+    Logger.Log(LogLevel.Info, $"Updated Rich Presence to '{activityType} {details}'");
+  }
+
+  private async void UpdateRichPresenceRandomly(object? state)
+  {
+    ThrowIfDisposed();
+
+    if (!_isInitialized || _client == null)
+    {
+      return;
+    }
+
+    var manager = Program.VRChatBot!.GetManagerOrDefault<VRCManager>();
+
+    var randomPresence = _richPresenceMessages[Random.Shared.Next(_richPresenceMessages.Count)];
+    randomPresence.Message = StringUtil.Replace(randomPresence.Message, "{online}", manager is not null ? manager.GroupUsers : 0);
+    randomPresence.Message = StringUtil.Replace(randomPresence.Message, "{maxpi}", manager is not null ? manager.GroupMaxUsers : 0);
+
+    await SetRichPresenceAsync(randomPresence.Message, randomPresence.Type);
   }
 }

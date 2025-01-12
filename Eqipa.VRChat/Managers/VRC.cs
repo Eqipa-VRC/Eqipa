@@ -26,9 +26,9 @@ public class VRCManager : ApiClient, IAsyncManager
   private string? _groupId;
   private bool _isLogged;
   private bool _isDisposed;
-  private int _groupUsers =  1;
+  private int _groupUsers = 0;
   private int _groupAdmins = 0;
-  private int _groupMaxUsers = 2;
+  private int _groupMaxUsers = 0;
   private UserManager? _userManager;
 
   private bool _isInitialized;
@@ -164,15 +164,6 @@ public class VRCManager : ApiClient, IAsyncManager
   }
   
   #region OSC
-  private string ReplaceFirst<T>(string input, string search, T replacement)
-  {
-    int index = input.IndexOf(search);
-    if (index < 0)
-      return input;
-
-    return input.Substring(0, index) + replacement + input.Substring(index + search.Length);
-  }
-
   private string ProcessOscMessage()
   {
     string text = string.Empty;
@@ -188,11 +179,10 @@ public class VRCManager : ApiClient, IAsyncManager
     }
 
     // TODO: automatic placeholder replacer
-    text = ReplaceFirst(text, "{maxpi}", _groupMaxUsers);
-    text = ReplaceFirst(text, "{online}", _groupUsers);
-    text = ReplaceFirst(text, "{admins}", _groupAdmins);
-    text = ReplaceFirst(text, "{percent}", PercentageConverter.Convert(_groupUsers, 0, _groupMaxUsers));
-    // text = ReplaceFirst()
+    text = StringUtil.Replace(text, "{maxpi}", _groupMaxUsers);
+    text = StringUtil.Replace(text, "{online}", _groupUsers);
+    text = StringUtil.Replace(text, "{admins}", _groupAdmins);
+    text = StringUtil.Replace(text, "{percent}", Math.Floor(PercentageConverter.Convert(_groupUsers, 0, _groupMaxUsers)));
 
     return text;
   }
