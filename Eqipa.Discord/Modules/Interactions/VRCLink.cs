@@ -258,8 +258,6 @@ public class VRCLinkInteractionModule : InteractionModuleBase<SocketInteractionC
 
       Logger.Log(LogLevel.Info, $"User data updated successfully for VRChat ID: {modal.VrcId}");
 
-      await DeferAsync(ephemeral: true);
-
       try
       {
         var embed = new EmbedBuilder()
@@ -269,6 +267,7 @@ public class VRCLinkInteractionModule : InteractionModuleBase<SocketInteractionC
             .WithFooter("Dziękujemy za weryfikację")
             .WithTimestamp(DateTimeOffset.Now);
 
+        await DeferAsync(ephemeral: true);
         await Context.User.SendMessageAsync(embed: embed.Build());
         await FollowupAsync("Weryfikacja zakończona pomyślnie. Wysłałem ci szczegóły w prywatnej wiadomości.", ephemeral: true);
 
@@ -277,6 +276,7 @@ public class VRCLinkInteractionModule : InteractionModuleBase<SocketInteractionC
       catch (Exception ex)
       {
         Logger.Log(LogLevel.Error, $"Failed to send DM to user {Context.User.Id}: {ex.Message}");
+        await DeferAsync(ephemeral: true);
         await FollowupAsync("Weryfikacja zakończona pomyślnie, ale nie mogę wysyłać ci prywatnej wiadomości. Upewnij się, że masz włączone przyjmowanie wiadomości prywatnych.", ephemeral: true);
       }
     }
