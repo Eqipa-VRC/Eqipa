@@ -64,7 +64,7 @@ public class VRCManager : ApiClient, IAsyncManager
     {
       Username = username,
       Password = password,
-      UserAgent = $"Eqipa/{VERSION} norelock"
+      UserAgent = USER_AGENT
     };
     _vrcAuth = new(this, this, _vrcConfig);
     _vrcInstances = new(this, this, _vrcConfig);

@@ -19,4 +19,5 @@ internal static class Constants
 
   // App stuff
   public static readonly string VERSION = Assembly.GetExecutingAssembly().GetName().Version!.ToString();
+  public static readonly string USER_AGENT = $"Eqipa/{VERSION} norelock";
 }

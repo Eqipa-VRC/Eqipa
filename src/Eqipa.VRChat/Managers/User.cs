@@ -135,9 +135,9 @@ public class UserManager : Registry<User>, IManager
       return;
     }
 
-    var inGroup = IsUserInGroup(userId);
     var invited = IsUserGroupInvited(userId);
-    if (!invited && !inGroup)
+    var inGroup = IsUserInGroup(userId);
+    if (!invited || !inGroup)
     {
       var groupInvite = new CreateGroupInviteRequest(userId);
 
@@ -183,12 +183,14 @@ public class UserManager : Registry<User>, IManager
     var data = Get(userId);
     if (data is not null)
     {
+      var lastVisit = data.LastVisit;
+
       List<string> msg = new()
       {
         $"Użytkownik ``{data.DisplayName}`` (``{userId}``) dołączył na instancje",
         $"Pierwszy raz dołączył w <t:{data.JoinedAt}:F>",
         "",
-        $"To jest jego {data.VisitCount} wejście, ostatnio był widziany w <t:{data.LastVisit}:F> (<t:{data.LastVisit}:R>)",
+        $"To jest jego {data.VisitCount} wejście, ostatnio był widziany w <t:{lastVisit}:F> (<t:{lastVisit}:R>)",
       };
 
       _ = _discordWebhookManager!.SendEmbed("Użytkownicy", String.Join("\n", msg));
@@ -286,7 +288,7 @@ public class UserManager : Registry<User>, IManager
       if (!string.IsNullOrEmpty(cookieStr))
         client.DefaultRequestHeaders.Add("Cookie", cookieStr);
 
-      client.DefaultRequestHeaders.Add("User-Agent", $"Eqipa/{VERSION} norelock");
+      client.DefaultRequestHeaders.Add("User-Agent", USER_AGENT);
 
       var json = JsonConvert.SerializeObject(data);
       var content = new StringContent(json, Encoding.UTF8, "application/json");

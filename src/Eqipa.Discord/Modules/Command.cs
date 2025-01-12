@@ -120,14 +120,14 @@ public class CommandModule
 
       switch (interaction.Type)
       {
-        case InteractionType.ApplicationCommand:
+        case InteractionType.ModalSubmit:
           {
-            var slashCommandResult = await _interactionService.ExecuteCommandAsync(context, _serviceProvider);
+            var modalSubmitResult = await _interactionService.ExecuteCommandAsync(context, _serviceProvider);
 
-            if (!slashCommandResult.IsSuccess)
+            if (!modalSubmitResult.IsSuccess)
             {
-              Logger.Log(LogLevel.Error, $"Application command interaction error: {slashCommandResult.ErrorReason}");
-              await interaction.RespondAsync($"Błąd: {slashCommandResult.ErrorReason}", ephemeral: true);
+              Logger.Log(LogLevel.Error, $"Application modal error: {modalSubmitResult.ErrorReason}");
+              await interaction.RespondAsync($"Błąd: {modalSubmitResult.ErrorReason}", ephemeral: true);
             }
             break;
           }
@@ -144,17 +144,17 @@ public class CommandModule
             break;
           }
 
-        case InteractionType.ModalSubmit:
-        {
-          var modalSubmitResult = await _interactionService.ExecuteCommandAsync(context, _serviceProvider);
-
-          if (!modalSubmitResult.IsSuccess)
+        case InteractionType.ApplicationCommand:
           {
-            Logger.Log(LogLevel.Error, $"Application modal error: {modalSubmitResult.ErrorReason}");
-            await interaction.RespondAsync($"Błąd: {modalSubmitResult.ErrorReason}", ephemeral: true);
+            var slashCommandResult = await _interactionService.ExecuteCommandAsync(context, _serviceProvider);
+
+            if (!slashCommandResult.IsSuccess)
+            {
+              Logger.Log(LogLevel.Error, $"Application command interaction error: {slashCommandResult.ErrorReason}");
+              await interaction.RespondAsync($"Błąd: {slashCommandResult.ErrorReason}", ephemeral: true);
+            }
+            break;
           }
-          break;
-        }
 
         default:
           // If the interaction type is unhandled, you can log or respond accordingly
