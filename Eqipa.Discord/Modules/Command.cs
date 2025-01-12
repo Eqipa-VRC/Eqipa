@@ -54,8 +54,6 @@ public class CommandModule
 
       foreach (var moduleType in moduleTypes)
       {
-        Logger.Log(LogLevel.Info, $"Registering {moduleType.Name} module");
-
         if (typeof(ModuleBase<SocketCommandContext>).IsAssignableFrom(moduleType))
         {
           await _commandService.AddModuleAsync(moduleType, _serviceProvider);
