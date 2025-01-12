@@ -5,6 +5,7 @@ using Eqipa.VRChat.Manager;
 using Color = Discord.Color;
 using Eqipa.Util;
 using System.Text.RegularExpressions;
+using VRChat.API.Client;
 
 namespace Eqipa.Discord.Modules.Interactions;
 
@@ -52,9 +53,18 @@ public class VRCLinkInteractionModule : InteractionModuleBase<SocketInteractionC
       return false;
 
     var manager = Program.VRChatBot.GetManager<VRCManager>();
-    var invite = manager.Friends!.Friend(id);
-    if (invite.Details == "{}")
-      return true;
+
+    try
+    {
+      var invite = manager.Friends!.Friend(id);
+      if (invite.Details == "{}")
+        return true;
+    }
+    catch (ApiException e)
+    {
+      if (e.Message.Contains("already friends"))
+        return true;
+    }
 
     return false;
   }
@@ -250,6 +260,9 @@ public class VRCLinkInteractionModule : InteractionModuleBase<SocketInteractionC
       // Inform user that verification is complete
       try
       {
+        // Acknowledge the interaction immediately
+        await DeferAsync(ephemeral: true);
+
         // Create the embed for DM
         var embed = new EmbedBuilder()
             .WithTitle("Weryfikacja zakończona")
@@ -261,15 +274,17 @@ public class VRCLinkInteractionModule : InteractionModuleBase<SocketInteractionC
         // Send DM to user
         await Context.User.SendMessageAsync(embed: embed.Build());
 
-        // Respond to the interaction to close it
-        await RespondAsync("Weryfikacja zakończona pomyślnie. Wysłałem ci szczegóły w prywatnej wiadomości.", ephemeral: true);
+        // Use FollowupAsync to finalize the response
+        await FollowupAsync("Weryfikacja zakończona pomyślnie. Wysłałem ci szczegóły w prywatnej wiadomości.", ephemeral: true);
 
         Logger.Log(LogLevel.Info, $"Verification DM sent successfully to user: {Context.User.Id}");
       }
       catch (Exception ex)
       {
         Logger.Log(LogLevel.Error, $"Failed to send DM to user {Context.User.Id}: {ex.Message}");
-        await RespondAsync("Weryfikacja zakończona pomyślnie, ale nie mogę wysyłać ci prywatnej wiadomości. Upewnij się, że masz włączone przyjmowanie wiadomości prywatnych.", ephemeral: true);
+
+        // Use FollowupAsync for final message in case of failure
+        await FollowupAsync("Weryfikacja zakończona pomyślnie, ale nie mogę wysyłać ci prywatnej wiadomości. Upewnij się, że masz włączone przyjmowanie wiadomości prywatnych.", ephemeral: true);
       }
     }
     else
