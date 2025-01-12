@@ -15,7 +15,7 @@ namespace Eqipa.Manager;
 
 public class VRCManager : ApiClient, IAsyncManager
 {
-  private readonly Core _core;
+  private readonly VRChatBot _vrchatBot;
   private protected InstancesApi _vrcInstances;
   public Configuration _vrcConfig;
   private protected AuthenticationApi _vrcAuth;
@@ -49,13 +49,13 @@ public class VRCManager : ApiClient, IAsyncManager
   public int GroupMaxUsers => _groupMaxUsers;
   public bool IsInitialized => _isInitialized;
 
-  public VRCManager(Core core) : base()
+  public VRCManager(VRChatBot core) : base()
   {
-    _core = core ?? throw new ArgumentNullException(nameof(core));
+    _vrchatBot = core ?? throw new ArgumentNullException(nameof(core));
 
     var (username, password) = (
-      _core.Config.GetConfig<string?>(c => c.VrchatUsername!) ?? throw new NullReferenceException("username null"),
-      _core.Config.GetConfig<string?>(c => c.VrchatPassword!) ?? throw new NullReferenceException("password null")
+      _vrchatBot.Config.GetConfig<string?>(c => c.VrchatUsername!) ?? throw new NullReferenceException("username null"),
+      _vrchatBot.Config.GetConfig<string?>(c => c.VrchatPassword!) ?? throw new NullReferenceException("password null")
     );
 
     _vrcConfig = new()
@@ -70,9 +70,9 @@ public class VRCManager : ApiClient, IAsyncManager
     Users = new(this, this, _vrcConfig);
     Groups = new(this, this, _vrcConfig);
 
-    _worldId = _core.Config.GetConfig<string?>(c => c.VrchatWorldId!);
-    _groupId = _core.Config.GetConfig<string?>(c => c.VrchatGroupId!);
-    _oscMessage = _core.Config.GetConfig<List<string>?>(c => c.VrchatOscMessage!);
+    _worldId = _vrchatBot.Config.GetConfig<string?>(c => c.VrchatWorldId!);
+    _groupId = _vrchatBot.Config.GetConfig<string?>(c => c.VrchatGroupId!);
+    _oscMessage = _vrchatBot.Config.GetConfig<List<string>?>(c => c.VrchatOscMessage!);
   }
 
   public void Initialize()
@@ -80,10 +80,10 @@ public class VRCManager : ApiClient, IAsyncManager
     if (_isInitialized)
       throw new ManagerAlreadyInitializedException(GetType());
 
-    Login();
+    // Login();
 
-    OSC = new(_core);
-    LogReader = new(_core);
+    OSC = new(_vrchatBot);
+    LogReader = new(_vrchatBot);
 
     _isInitialized = true;
   }
@@ -229,8 +229,8 @@ public class VRCManager : ApiClient, IAsyncManager
           User = _vrcAuth.GetCurrentUser();
           Group = Groups!.GetGroup(_groupId, true);
 
-          if (_core.HasManager<UserManager>())
-            _userManager = _core.GetManagerOrDefault<UserManager>();
+          if (_vrchatBot.HasManager<UserManager>())
+            _userManager = _vrchatBot.GetManagerOrDefault<UserManager>();
 
           UpdateInfo();
           _isLogged = true;

@@ -5,9 +5,9 @@ using Eqipa.Discord;
 
 namespace Eqipa;
 
-public class Core : Singleton<Core>, IDisposable
+public class VRChatBot : Singleton<VRChatBot>, IDisposable
 {
-  public Core()
+  public VRChatBot()
   {
     Logger.Log(LogLevel.Step, "Initializing..");
     Initialize();
@@ -31,11 +31,9 @@ public class Core : Singleton<Core>, IDisposable
     Logger.Log(LogLevel.Step, "Registering managers...");
 
     RegisterManager(new DiscordWebhookManager(this));
-    RegisterManager(new VRCManager(this));
-    RegisterManager(new UserManager(this));
-    RegisterManager(new ReceiverManager(this));
-    RegisterManager(new SpeechManager(this));
-    RegisterManager(new VRCInstanceManager(this));
+    // RegisterManager(new VRCManager(this));
+    // RegisterManager(new UserManager(this));
+    // RegisterManager(new VRCInstanceManager(this));
   }
 
   private async void Initialize()
@@ -243,11 +241,11 @@ public class Core : Singleton<Core>, IDisposable
   {
     if (_isDisposed)
     {
-      throw new ObjectDisposedException(nameof(Core));
+      throw new ObjectDisposedException(nameof(VRChatBot));
     }
   }
 
-  ~Core()
+  ~VRChatBot()
   {
     Dispose(false);
   }

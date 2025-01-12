@@ -1,18 +1,19 @@
 using Discord;
+using Discord.Commands;
+using Discord.Interactions;
 using Discord.WebSocket;
 using Eqipa.Util;
+using Eqipa.Discord.Modules;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.VisualBasic.Logging;
 
 namespace Eqipa.Discord;
 
 public class DiscordBot : Singleton<DiscordBot>, IDisposable
 {
-  private DiscordSocketClient _client;
-
-  private readonly DiscordSocketConfig _config = new()
-  {
-    LogLevel = LogSeverity.Info,
-    MessageCacheSize = 1000
-  };
+  private CommandModule? _commandModule;
+  private IServiceProvider? _serviceProvider;
+  private DiscordSocketClient? _client;
 
   private bool _isInitialized = false;
   private bool _isDisposed = false;
@@ -29,21 +30,21 @@ public class DiscordBot : Singleton<DiscordBot>, IDisposable
   {
     ThrowIfDisposed();
 
-    try
+    _client = new DiscordSocketClient(new DiscordSocketConfig
     {
-      Logger.Log(LogLevel.Info, "Setting up Discord client...");
-      _client = new(_config);
+      LogLevel = LogSeverity.Info,
+      GatewayIntents = GatewayIntents.All,
+      MessageCacheSize = 1000,
+      AlwaysDownloadUsers = true,
+    });
 
-      _client.Log += OnLog;
-      _client.Ready += OnReady;
+    _client.Log += OnLog;
+    _client.Ready += OnReady;
 
-      _isInitialized = true;
-    }
-    catch (Exception ex)
-    {
-      Logger.Log(LogLevel.Error, $"Failed to initialize Discord client: {ex.Message}");
-      throw;
-    }
+    _serviceProvider = ConfigureServices();
+
+    _commandModule = new CommandModule(_client, _serviceProvider);
+    _isInitialized = true;
   }
 
   public async Task StartAsync(string token)
@@ -55,46 +56,49 @@ public class DiscordBot : Singleton<DiscordBot>, IDisposable
       throw new InvalidOperationException("DiscordBot must be initialized before starting.");
     }
 
-    try
-    {
-      Logger.Log(LogLevel.Info, "Connecting to Discord...");
-      await _client.LoginAsync(TokenType.Bot, token);
-      await _client.StartAsync();
+    // Initialize commands and interactions
+    await _commandModule!.InitializeAsync();
 
-      Logger.Log(LogLevel.Info, "Bot connected successfully!");
-    }
-    catch (Exception ex)
-    {
-      Logger.Log(LogLevel.Error, $"Failed to start Discord bot: {ex.Message}");
-      throw;
-    }
+    Logger.Log(LogLevel.Info, "Connecting to Discord...");
+    await _client!.LoginAsync(TokenType.Bot, token);
+    await _client.StartAsync();
+
+    Logger.Log(LogLevel.Info, "Bot connected successfully!");
   }
 
-  public async Task StopAsync()
+  private async Task OnReady()
   {
-    ThrowIfDisposed();
+    Logger.Log(LogLevel.Info, "Bot is ready and connected to Discord.");
 
-    if (!_isInitialized)
+    // Register commands globally or per guild
+    try
     {
-      throw new InvalidOperationException("DiscordBot is not initialized.");
+      await _commandModule!.RegisterCommandsGloballyAsync();
+      Logger.Log(LogLevel.Info, "Registered commands");
     }
+    catch (Exception e)
+    {
+      Logger.Log(LogLevel.Error, $"{e.Message}\n{e.StackTrace}");
+    }
+    // Alternatively: await _commandModule.RegisterCommandsToGuildAsync(guildId);
+  }
 
-    Logger.Log(LogLevel.Info, "Stopping Discord bot...");
-    await _client.LogoutAsync();
-    await _client.StopAsync();
+  private IServiceProvider ConfigureServices()
+  {
+    var services = new ServiceCollection();
 
-    Logger.Log(LogLevel.Info, "Bot stopped successfully.");
+    // Register required services
+    services.AddSingleton(_client!);
+    services.AddSingleton<CommandModule>();
+    services.AddSingleton<CommandService>();
+    services.AddSingleton<InteractionService>();
+
+    return services.BuildServiceProvider();
   }
 
   private Task OnLog(LogMessage message)
   {
-    Logger.Log(ConvertLogLevel(message.Severity), message.ToString());
-    return Task.CompletedTask;
-  }
-
-  private Task OnReady()
-  {
-    Logger.Log(LogLevel.Info, "Bot is ready and connected to Discord.");
+    Logger.Log(ConvertLogLevel(message.Severity), message.Message);
     return Task.CompletedTask;
   }
 

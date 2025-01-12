@@ -5,7 +5,7 @@ namespace Eqipa;
 
 internal class Program
 {
-  private static Core? _core;
+  public static VRChatBot? VRChatBot;
   private static bool _isShuttingDown;
   private static DateTime _launched = DateTime.Now;
 
@@ -32,13 +32,14 @@ internal class Program
 
   private static void Initialize()
   {
-    Logger.Log(LogLevel.Step, $"Launching Eqipa {VERSION}");
+    double elapsed;
     
-    var elapsed = (DateTime.Now - _launched).TotalMilliseconds;
+    Logger.Log(LogLevel.Step, $"Launching Eqipa {VERSION}");
 
     try
     {
-      _core = Core.Instance;
+      VRChatBot = VRChatBot.Instance;
+      elapsed = (DateTime.Now - _launched).TotalMilliseconds;
     }
     catch (Exception ex)
     {
@@ -80,11 +81,10 @@ internal class Program
 
     try
     {
-      // Dispose Core and its managers
-      if (_core != null)
+      if (VRChatBot is not null)
       {
-        _core.Dispose();
-        _core = null;
+        VRChatBot.Dispose();
+        VRChatBot = null;
       }
     }
     catch (Exception ex)

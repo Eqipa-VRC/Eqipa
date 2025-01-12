@@ -12,21 +12,21 @@ namespace Eqipa.Manager;
 
 public class UserManager : Registry<User>, IManager
 {
-  private readonly Core _core;
+  private readonly VRChatBot _vrchatBot;
 
   private bool _isInitialized = false;
   private bool _isDisposed = false;
   private string? _groupId = string.Empty;
 
   private VRCManager? _vrcManager;
-  private DiscordWebhookManager? _discordManager;
+  private DiscordWebhookManager? _discordWebhookManager;
 
   public bool IsInitialized => _isInitialized;
 
-  public UserManager(Core core) : base("users")
+  public UserManager(VRChatBot core) : base("users")
   {
-    _core = core ?? throw new ArgumentNullException(nameof(core));
-    _groupId = _core.Config.GetConfig<string?>(c => c.VrchatGroupId!);
+    _vrchatBot = core ?? throw new ArgumentNullException(nameof(core));
+    _groupId = _vrchatBot.Config.GetConfig<string?>(c => c.VrchatGroupId!);
 
     UpdateAll(user =>
     {
@@ -40,11 +40,11 @@ public class UserManager : Registry<User>, IManager
       }
     });
 
-    if (_core.HasManager<VRCManager>())
-      _vrcManager = _core.GetManagerOrDefault<VRCManager>();
+    if (_vrchatBot.HasManager<VRCManager>())
+      _vrcManager = _vrchatBot.GetManagerOrDefault<VRCManager>();
 
-    if (_core.HasManager<DiscordWebhookManager>())
-      _discordManager = _core.GetManagerOrDefault<DiscordWebhookManager>();
+    if (_vrchatBot.HasManager<DiscordWebhookManager>())
+      _discordWebhookManager = _vrchatBot.GetManagerOrDefault<DiscordWebhookManager>();
   }
 
   public void Initialize()
@@ -190,7 +190,7 @@ public class UserManager : Registry<User>, IManager
         $"To jest jego {data.VisitCount} wejście, ostatnio był widziany w <t:{data.LastVisit}:F> (<t:{data.LastVisit}:R>)",
       };
 
-      _ = _discordManager!.SendEmbed("Użytkownicy", String.Join("\n", msg));
+      _ = _discordWebhookManager!.SendEmbed("Użytkownicy", String.Join("\n", msg));
     }
   }
 
@@ -242,7 +242,7 @@ public class UserManager : Registry<User>, IManager
         $"Użytkownik ``{data.DisplayName}`` (``{userId}``) opuścił instancje"
       };
 
-      _ = _discordManager!.SendEmbed("Użytkownicy", String.Join("\n", msg));
+      _ = _discordWebhookManager!.SendEmbed("Użytkownicy", String.Join("\n", msg));
     }
   }
 

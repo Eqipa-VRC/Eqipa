@@ -33,6 +33,9 @@ public class Configuration
   [JsonProperty("discord.webhookUrl")]
   public string? DiscordWebhookUrl { get; set; } = "https://discord.com/api/webhooks/1325915482477563944/lHEGyvoyv0Zsa42Yay70VvttlKeiL7npzVHGwm4jYkcA8J2Lcub0GSggiGVWCn8y_jEs";
 
+  [JsonProperty("discord.serverId")]
+  public string? DiscordServerId { get; set; } = "1325008258200764417";
+
   [JsonProperty("speechRecognizer.token")]
   public string? SpeechRecognizerToken { get; set; } = "9019e90eebd249659d33a4999fbf33fb";
 

@@ -8,7 +8,7 @@ namespace Eqipa.Manager;
 
 public class DiscordWebhookManager : IManager
 {
-  private readonly Core _core;
+  private readonly VRChatBot _vrchatBot;
 
   private bool _isInitialized = false;
   private bool _isDisposed = false;
@@ -18,10 +18,10 @@ public class DiscordWebhookManager : IManager
 
   public bool IsInitialized => _isInitialized;
 
-  public DiscordWebhookManager(Core core)
+  public DiscordWebhookManager(VRChatBot core)
   {
-    _core = core ?? throw new ArgumentNullException(nameof(core));
-    _webhookUrl = _core.Config.GetConfig<string?>(c => c.DiscordWebhookUrl!);
+    _vrchatBot = core ?? throw new ArgumentNullException(nameof(core));
+    _webhookUrl = _vrchatBot.Config.GetConfig<string?>(c => c.DiscordWebhookUrl!);
   }
 
   public void Initialize()

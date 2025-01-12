@@ -10,7 +10,7 @@ namespace Eqipa.Module.Internal;
 
 public class VRCLogReader
 {
-  private readonly Core? _core;
+  private readonly VRChatBot? _vrchatBot;
   private readonly Dictionary<int, long> _processOffsets = new();
   private readonly Dictionary<int, FileInfo?> _processLogFiles = new();
   private readonly List<string> _ignorePatterns = new()
@@ -29,9 +29,9 @@ public class VRCLogReader
   private readonly HashSet<int> _monitoredProcesses = new();
   private bool _isEOSLauncherRunning = false;
 
-  public VRCLogReader(Core core)
+  public VRCLogReader(VRChatBot core)
   {
-    _core = core;
+    _vrchatBot = core;
     Logger.Log(LogLevel.Info, "VRCLogReader constructed");
     _ = DetectVRChatProcess();
   }
@@ -203,7 +203,7 @@ public class VRCLogReader
     {
       if (!ProcessLine(processId, line))
       {
-        Console.WriteLine(line);
+        // Console.WriteLine(line);
       }
     }
   }

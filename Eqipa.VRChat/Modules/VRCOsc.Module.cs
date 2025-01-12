@@ -13,15 +13,15 @@ public enum VRCOscAddresses
 
 public class VRCOsc
 {
-  private Core? _core;
+  private VRChatBot? _vrchatBot;
   private readonly List<OscQueryServer> _oscQueryServers = new();
   private readonly HashSet<IPEndPoint> _connectedEndpoints = new();
   private readonly List<OscConnection> _connections = new();
   private readonly object _lock = new object();
 
-  public VRCOsc(Core core)
+  public VRCOsc(VRChatBot core)
   {
-    _core = core;
+    _vrchatBot = core;
 
     var server = new OscQueryServer("Eqipa", IPAddress.Loopback); 
     server.FoundVrcClient += HandleNewVrcClient;
@@ -46,7 +46,7 @@ public class VRCOsc
 
       _connectedEndpoints.Add(ipEndPoint);
 
-      var newConnection = new OscConnection(_core!, oscQueryServer, ipEndPoint);
+      var newConnection = new OscConnection(_vrchatBot!, oscQueryServer, ipEndPoint);
       _connections.Add(newConnection);
       newConnection.StartReceiverLoop();
 
@@ -70,14 +70,14 @@ public class VRCOsc
 
   private class OscConnection : IDisposable
   {
-    private readonly Core _core;
+    private readonly VRChatBot _vrchatBot;
     private readonly OscDuplex _gameConnection;
     private readonly CancellationTokenSource _loopCancellationToken = new();
     public IPEndPoint Endpoint { get; }
 
-    public OscConnection(Core core, OscQueryServer oscQueryServer, IPEndPoint ipEndPoint)
+    public OscConnection(VRChatBot core, OscQueryServer oscQueryServer, IPEndPoint ipEndPoint)
     {
-      _core = core;
+      _vrchatBot = core;
       _gameConnection = new OscDuplex(new IPEndPoint(ipEndPoint.Address, oscQueryServer.OscReceivePort), ipEndPoint);
       Endpoint = ipEndPoint;
 
@@ -124,7 +124,7 @@ public class VRCOsc
 
       // if (received.Address == "/avatar/parameters/MuteSelf")
       // {
-      //     _core.Bus.Emit("PlayerMuted", (bool)received.Arguments[0]!);
+      //     _vrchatBot.Bus.Emit("PlayerMuted", (bool)received.Arguments[0]!);
       // }
     }
 

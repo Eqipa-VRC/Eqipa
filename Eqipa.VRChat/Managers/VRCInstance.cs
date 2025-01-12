@@ -6,20 +6,20 @@ namespace Eqipa.Manager;
 
 public class VRCInstanceManager : IManager
 {
-  private readonly Core _core;
+  private readonly VRChatBot _vrchatBot;
   private bool _isDisposed = false;
   private bool _isInitialized = false;
 
   private UserManager? _userManager;
   private VRCLogReader? _logReader;
-  private DiscordWebhookManager? _discordManager;
+  private DiscordWebhookManager? _discordWebhookManager;
   private readonly Dictionary<int, VRCInstance> _processInstances = new();
 
   public bool IsInitialized => _isInitialized;
 
-  public VRCInstanceManager(Core core)
+  public VRCInstanceManager(VRChatBot core)
   {
-    _core = core ?? throw new ArgumentNullException(nameof(core));
+    _vrchatBot = core ?? throw new ArgumentNullException(nameof(core));
   }
 
   public void Initialize()
@@ -27,19 +27,17 @@ public class VRCInstanceManager : IManager
     if (_isInitialized)
       throw new ManagerAlreadyInitializedException(GetType());
 
-    _isInitialized = true;
+    if (_vrchatBot.HasManager<VRCManager>())
+      _logReader = _vrchatBot.GetManagerOrDefault<VRCManager>()!.LogReader;
 
-    if (_core.HasManager<VRCManager>())
-      _logReader = _core.GetManagerOrDefault<VRCManager>()!.LogReader;
+    if (_vrchatBot.HasManager<UserManager>())
+      _userManager = _vrchatBot.GetManagerOrDefault<UserManager>();
 
-    if (_core.HasManager<UserManager>())
-      _userManager = _core.GetManagerOrDefault<UserManager>();
-
-    if (_core.HasManager<DiscordWebhookManager>())
-      _discordManager = _core.GetManagerOrDefault<DiscordWebhookManager>();
+    if (_vrchatBot.HasManager<DiscordWebhookManager>())
+      _discordWebhookManager = _vrchatBot.GetManagerOrDefault<DiscordWebhookManager>();
 
     _logReader!.OnProcessed += OnLogProcessed;
-    Logger.Log(LogLevel.Info, "VRCInstanceManager initialized.");
+    _isInitialized = true;
   }
 
   public void Shutdown()
@@ -124,7 +122,7 @@ public class VRCInstanceManager : IManager
       var info = _processInstances[processId];
 
       Logger.Log(LogLevel.Info, $"Process {processId} entered {worldAccessType} world {worldName} ({worldId}) in group {groupId}, region {region}.");
-      _discordManager!.SendEmbed($"Uruchomiono monitorowanie instancji {info.GetInstanceId()}", $"VRChat ID: {processId}", "#32a852");
+      _ = _discordWebhookManager!.SendEmbed($"Uruchomiono monitorowanie instancji {info.GetInstanceId()}", $"VRChat ID: {processId}", "#32a852");
     }
     else
     {
@@ -136,7 +134,7 @@ public class VRCInstanceManager : IManager
       instance.WorldRegion = region;
 
       Logger.Log(LogLevel.Info, $"Process {processId} changed to world {worldName} ({worldId}) in group {groupId}, region {region}.");
-      _discordManager!.SendEmbed($"Zmiana instancji do monitorowania na {instance.GetInstanceId()}", $"VRChat ID: {processId}", "#32a852");
+      _ = _discordWebhookManager!.SendEmbed($"Zmiana instancji do monitorowania na {instance.GetInstanceId()}", $"VRChat ID: {processId}", "#32a852");
     }
   }
 
@@ -157,7 +155,7 @@ public class VRCInstanceManager : IManager
       instance.WorldRegion = string.Empty;
 
       Logger.Log(LogLevel.Info, $"Process {processId} instance reset.");
-      _discordManager!.SendEmbed("Resetowanie monitoringu", "", "#32a852");
+      _ = _discordWebhookManager!.SendEmbed("Resetowanie monitoringu", "", "#32a852");
     }
     else
     {
@@ -196,6 +194,6 @@ public class VRCInstanceManager : IManager
 
     _processInstances.Remove(processId);
     Logger.Log(LogLevel.Info, $"Removed process {processId} from world tracking");
-    _discordManager!.SendEmbed($"Wyłączanie monitoringu instancji {processor.GetInstanceId()}", $"ID: {processId}", "#32a852");
+    _ = _discordWebhookManager!.SendEmbed($"Wyłączanie monitoringu instancji {processor.GetInstanceId()}", $"ID: {processId}", "#32a852");
   }
 }

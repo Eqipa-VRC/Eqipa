@@ -25,6 +25,8 @@
     <PackageReference Include="Discord.Net.Rest" Version="3.17.0" />
     <PackageReference Include="Discord.Net.Webhook" Version="3.17.0" />
     <PackageReference Include="Discord.Net.WebSocket" Version="3.17.0" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="9.0.0" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="9.0.0" />
     <PackageReference Include="NAudio" Version="2.2.1" />
     <PackageReference Include="NAudio.Core" Version="2.2.1" />
     <PackageReference Include="NAudio.Wasapi" Version="2.2.1" />
