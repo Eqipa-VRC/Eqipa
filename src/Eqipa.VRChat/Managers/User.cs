@@ -264,12 +264,13 @@ public class UserManager : Registry<User>, IManager
     return false;
   }
 
+  private const int GROUP_INVITES_OFFSET = 1000;
   private bool IsUserGroupInvited(string userId)
   {
     if (!_vrcManager!.IsLogged)
       return true;
 
-    var invites = _vrcManager!.Groups!.GetGroupInvites(_groupId, 100);
+    var invites = _vrcManager!.Groups!.GetGroupInvites(_groupId, GROUP_INVITES_OFFSET);
     if (invites.Any(invite => invite.UserId == userId || invite.User.Id == userId))
       return true;
 
