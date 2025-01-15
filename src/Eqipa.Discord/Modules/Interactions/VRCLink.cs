@@ -91,7 +91,6 @@ public class VRCLinkInteractionModule : InteractionModuleBase<SocketInteractionC
     while (elapsedTime < timeout)
     {
       await Task.Delay(interval);
-
       if (DidUserAccepted(vrcUserId))
         return true;
 

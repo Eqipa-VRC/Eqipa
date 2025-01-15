@@ -2,32 +2,23 @@ using Newtonsoft.Json;
 
 namespace Eqipa.Model;
 
-public enum RecognizeLang
+public enum UserStatus
 {
-  Polish,
-  English,
+  Online = 1,
+  Offline = 0
 }
 
-public class UserAvatar
-{
-  [JsonProperty("id")]
-  public string? Id { get; set; } = null;
-  
-  [JsonProperty("name")]
-  public string? Name { get; set; } = null;
-}
+// public enum RecognizeLang
+// {
+//   Polish,
+//   English,
+// }
 
 public enum UserPenaltyType
 {
   Ban,
   Warning,
   Blacklist
-}
-
-public enum UserStatus
-{
-  Online,
-  Offline
 }
 
 public class UserPenalty
@@ -84,7 +75,7 @@ public class User
   public string? DisplayName { get; set; } = null;
 
   [JsonProperty("lastAvatars")]
-  public List<UserAvatar>? LastAvatars { get; set; } = new(); // empty array = []
+  public List<Avatar>? LastAvatars { get; set; } = new(); // empty array = []
 
   [JsonProperty("currentInstanceId")]
   public string? CurrentInstanceId { get; set; } = null;
