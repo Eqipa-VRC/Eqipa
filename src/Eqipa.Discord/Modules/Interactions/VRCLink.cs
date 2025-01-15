@@ -84,8 +84,8 @@ public class VRCLinkInteractionModule : InteractionModuleBase<SocketInteractionC
 
   private async Task<bool> WaitForFriendAcceptance(string vrcUserId)
   {
-    var interval = 5000;
-    var timeout = 30000;
+    var interval = 15000;
+    var timeout = 60000;
     var elapsedTime = 0;
 
     while (elapsedTime < timeout)

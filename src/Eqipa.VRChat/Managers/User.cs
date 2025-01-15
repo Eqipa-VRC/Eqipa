@@ -137,17 +137,20 @@ public class UserManager : Registry<User>, IManager
 
     var invited = IsUserGroupInvited(userId);
     var inGroup = IsUserInGroup(userId);
-    if (!invited || !inGroup)
+    if (!inGroup)
     {
-      var groupInvite = new CreateGroupInviteRequest(userId);
+      if (!invited)
+      {
+        var groupInvite = new CreateGroupInviteRequest(userId);
 
-      try
-      {
-        _vrcManager.Groups!.CreateGroupInvite(_groupId, groupInvite);
-      }
-      catch (ApiException ex)
-      {
-        Logger.Log(LogLevel.Error, $"Cannot invite user to group: {ex.Message}");
+        try
+        {
+          _vrcManager.Groups!.CreateGroupInvite(_groupId, groupInvite);
+        }
+        catch (ApiException ex)
+        {
+          Logger.Log(LogLevel.Error, $"Cannot invite user to group: {ex.Message}");
+        }
       }
     }
 
@@ -306,7 +309,7 @@ public class UserManager : Registry<User>, IManager
       }
     }
   }
-  
+
   // await SendModeration(new() {
   //   Type = "warn",
   //   Reason = "test",

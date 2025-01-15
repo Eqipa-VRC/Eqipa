@@ -38,6 +38,7 @@ public class VRCAccountInteractionModule : InteractionModuleBase<SocketInteracti
 
     var embed = new EmbedBuilder()
       .WithTitle($"Twoje konto (``{account.Id}``)")
+      .WithFooter("*system jeszcze w budowie (początkowy rozwój)*")
       .WithDescription($"{(account.Penalties!.Count != 0 ? $":orange_circle: Posiadasz {account.Penalties.Count} nałożonych kar na twoje konto" : ":green_circle: Nie posiadasz nałożonych kar")}")
       .AddField("W grze", $"{(account.Status is UserStatus.Online ? "Tak" : $"Nie (od <t:{account.LastVisit}:R>)")}", true)
       .AddField("Dołączono", $"<t:{account.JoinedAt}:F>", true)

@@ -96,8 +96,8 @@ public class VRCManager : ApiClient, IAsyncManager
     if (!_isInitialized || _isDisposed)
       return;
 
-    _groupUsers = _isLogged ? _userManager!.GetCountByCondition(u => u.Status is UserStatus.Online) : 1;
-    _groupAdmins = _isLogged ? _userManager!.GetCountByCondition(u => u.Admin && u.Status is UserStatus.Online) : 1;
+    _groupUsers = _isLogged ? _userManager!.GetCountByCondition(u => u.Status is UserStatus.Online) : 0;
+    _groupAdmins = _isLogged ? _userManager!.GetCountByCondition(u => u.Admin && u.Status is UserStatus.Online) : 0;
 
     if ((DateTime.UtcNow - _lastOSCUpdate).TotalSeconds >= 5)
     {
