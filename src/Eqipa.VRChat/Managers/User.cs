@@ -264,7 +264,7 @@ public class UserManager : Registry<User>, IManager
     return false;
   }
 
-  private const int GROUP_INVITES_OFFSET = 1000;
+  private const int GROUP_INVITES_OFFSET = 100;
   private bool IsUserGroupInvited(string userId)
   {
     if (!_vrcManager!.IsLogged)
