@@ -2,6 +2,7 @@ using Eqipa.Model;
 using Eqipa.Util;
 using Eqipa.Discord;
 using Eqipa.VRChat.Manager;
+using System.Reflection;
 
 namespace Eqipa.VRChat;
 
@@ -19,7 +20,7 @@ public class VRChatBot : Singleton<VRChatBot>, IDisposable
 
   private readonly Dictionary<Type, IManager> _managers = new();
   private readonly CancellationTokenSource _updateLoopCancellation = new();
-  
+
   private Task? _updateLoopTask;
   private bool _isInitialized = false;
   private bool _isDisposed = false;
@@ -28,13 +29,38 @@ public class VRChatBot : Singleton<VRChatBot>, IDisposable
 
   private void RegisterAllManagers()
   {
-    // TODO: automatic importing managers with priority
     Logger.Log(LogLevel.Step, "Registering managers...");
 
-    RegisterManager(new DiscordWebhookManager(this));
-    RegisterManager(new VRCManager(this));
-    RegisterManager(new UserManager(this));
-    RegisterManager(new VRCInstanceManager(this));
+    var types = Assembly.GetExecutingAssembly().GetTypes()
+      .Where(t => t.GetInterfaces().Contains(typeof(IManager)) || t.GetInterfaces().Contains(typeof(IAsyncManager)))
+      ;
+
+    Logger.Log(LogLevel.Info, $"Found {types.Count()} managers");
+
+    // prioritize managers that implement IAsyncManager
+    types = types.OrderByDescending(t => t.GetInterfaces().Contains(typeof(IAsyncManager)));
+
+    foreach (var type in types)
+    {
+      if (type.IsAbstract || type.IsInterface)
+        continue;
+
+      var manager = Activator.CreateInstance(type, this);
+      if (manager is IAsyncManager asyncManagerInstance)
+      {
+        RegisterManager(asyncManagerInstance);
+      }
+      else
+      if (manager is IManager managerInstance)
+      {
+        RegisterManager(managerInstance);
+      }
+    }
+
+    // RegisterManager(new DiscordWebhookManager(this));
+    // RegisterManager(new VRCManager(this));
+    // RegisterManager(new UserManager(this));
+    // RegisterManager(new VRCInstanceManager(this));
   }
 
   private async void Initialize()

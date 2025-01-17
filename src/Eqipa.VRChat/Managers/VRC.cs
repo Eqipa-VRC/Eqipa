@@ -91,47 +91,6 @@ public class VRCManager : ApiClient, IAsyncManager
     _isInitialized = true;
   }
 
-  public async Task UpdateAsync()
-  {
-    if (!_isInitialized || _isDisposed)
-      return;
-
-    _groupUsers = _isLogged ? _userManager!.GetCountByCondition(u => u.Status is UserStatus.Online) : 0;
-    _groupAdmins = _isLogged ? _userManager!.GetCountByCondition(u => u.Admin && u.Status is UserStatus.Online) : 0;
-
-    if ((DateTime.UtcNow - _lastOSCUpdate).TotalSeconds >= 5)
-    {
-      _lastOSCUpdate = DateTime.UtcNow;
-
-      try
-      {
-        await UpdateOsc();
-
-      }
-      catch (Exception ex)
-      {
-        Logger.Log(LogLevel.Error, $"Error in VRCManager UpdateAsync: {ex.Message}");
-      }
-    }
-
-    if ((DateTime.UtcNow - _lastInfoUpdate).TotalSeconds >= 60)
-    {
-      _lastInfoUpdate = DateTime.UtcNow;
-
-      if (!_isLogged)
-        return;
-
-      try
-      {
-        UpdateInfo();
-      }
-      catch (Exception ex)
-      {
-        Logger.Log(LogLevel.Error, $"Error in VRCManager UpdateAsync: {ex.Message}");
-      }
-    }
-  }
-
   public void Shutdown()
   {
     if (!_isInitialized) return;
@@ -162,38 +121,6 @@ public class VRCManager : ApiClient, IAsyncManager
   {
     Dispose(false);
   }
-  
-  #region OSC
-  private string ProcessOscMessage()
-  {
-    string text = string.Empty;
-    foreach (string line in _oscMessage!)
-    {
-      if (string.IsNullOrEmpty(line))
-      {
-        text += "\n";
-        continue;
-      }
-
-      text += line;
-    }
-
-    // TODO: automatic placeholder replacer
-    text = StringUtil.Replace(text, "{maxpi}", _groupMaxUsers);
-    text = StringUtil.Replace(text, "{online}", _groupUsers);
-    text = StringUtil.Replace(text, "{admins}", _groupAdmins);
-    text = StringUtil.Replace(text, "{percent}", Math.Floor(PercentageConverter.Convert(_groupUsers, 0, _groupMaxUsers)));
-
-    return text;
-  }
-
-  private async Task UpdateOsc()
-  {
-    var message = ProcessOscMessage();
-
-    await OSC!.Send(GetOscAddress(VRCOscAddresses.SEND_CHATBOX_MESSAGE), message, true);
-  }
-  #endregion
 
   private void Login()
   {
@@ -234,6 +161,29 @@ public class VRCManager : ApiClient, IAsyncManager
     catch (ApiException e)
     {
       Logger.Log(LogLevel.Error, $"API login error: {e.Message}");
+    }
+  }
+
+  public void Update()
+  {
+    if (!_isInitialized || _isDisposed || !_isLogged)
+      return;
+
+    _groupUsers = _isLogged ? _userManager!.GetCountByCondition(u => u.Status is UserStatus.Online) : 0;
+    _groupAdmins = _isLogged ? _userManager!.GetCountByCondition(u => u.Admin && u.Status is UserStatus.Online) : 0;
+
+    if ((DateTime.UtcNow - _lastInfoUpdate).TotalSeconds >= 60)
+    {
+      _lastInfoUpdate = DateTime.UtcNow;
+
+      try
+      {
+        UpdateInfo();
+      }
+      catch (Exception ex)
+      {
+        Logger.Log(LogLevel.Error, $"Error in VRCManager: {ex.Message}");
+      }
     }
   }
 
