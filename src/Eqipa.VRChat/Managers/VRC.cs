@@ -35,7 +35,6 @@ public class VRCManager : ApiClient, IAsyncManager
   private DateTime _lastOSCUpdate = DateTime.MinValue;
   private DateTime _lastInfoUpdate = DateTime.MinValue;
 
-  public VRCOsc? OSC { get; private set; }
   public UsersApi? Users { get; private set; }
   public GroupsApi? Groups { get; private set; }
   public Group? Group { get; private set; }
@@ -85,7 +84,6 @@ public class VRCManager : ApiClient, IAsyncManager
 
     Login();
 
-    OSC = new(_vrchatBot);
     LogReader = new(_vrchatBot);
 
     _isInitialized = true;

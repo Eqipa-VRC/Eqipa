@@ -7,7 +7,7 @@ namespace Eqipa.Model;
 public class Configuration
 {
   [JsonProperty("gpt.api")]
-  public string? GptApi { get; set; } = "http://195.179.227.219:1337/v1";
+  public string? GptApi { get; set; } = string.Empty;
 
   [JsonProperty("gpt.token")]
   public string? GptToken { get; set; } = null;
@@ -19,25 +19,25 @@ public class Configuration
   public string? VrchatWorldId { get; set; } = "wrld_dec35e59-53f5-4def-b29c-2d7b649b8638";
 
   [JsonProperty("vrchat.username")]
-  public string? VrchatUsername { get; set; } = "eqipleeburton@gmail.com";
+  public string? VrchatUsername { get; set; } = string.Empty;
 
   [JsonProperty("vrchat.password")]
-  public string? VrchatPassword { get; set; } = "eqipleeburton@gmail.com";
+  public string? VrchatPassword { get; set; } = string.Empty;
 
   [JsonProperty("vrchat.oscMessage")]
   public List<string> VrchatOscMessage { get; set; } = new() {};
 
   [JsonProperty("discord.token")]
-  public string? DiscordToken { get; set; } = "MTMyNzUwOTMyMDQ5NzM2OTEzOQ.G1lz3c.2FxMacx-BQfFO-X2x_npoXEwnyWE0eVIgAvX3Q";
+  public string? DiscordToken { get; set; } = string.Empty;
 
   [JsonProperty("discord.webhookUrl")]
-  public string? DiscordWebhookUrl { get; set; } = "https://discord.com/api/webhooks/1325915482477563944/lHEGyvoyv0Zsa42Yay70VvttlKeiL7npzVHGwm4jYkcA8J2Lcub0GSggiGVWCn8y_jEs";
+  public string? DiscordWebhookUrl { get; set; } = string.Empty;
 
   [JsonProperty("discord.serverId")]
   public string? DiscordServerId { get; set; } = "1325008258200764417";
 
   [JsonProperty("speechRecognizer.token")]
-  public string? SpeechRecognizerToken { get; set; } = "9019e90eebd249659d33a4999fbf33fb";
+  public string? SpeechRecognizerToken { get; set; } = string.Empty;
 
   [JsonProperty("speechRecognizer.region")]
   public string? SpeechRecognizerRegion { get; set; } = "northeurope";
